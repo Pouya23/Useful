@@ -1,0 +1,11 @@
+# Install Chatterbox according to its own pinned environment first.
+# Then add the estimator dependencies:
+numpy
+scipy
+scikit-learn
+joblib
+cmudict
+lightgbm
+
+# TTS dependency used by collect/probe:
+chatterbox-tts
