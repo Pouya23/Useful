@@ -1,0 +1,8 @@
+# Chatterbox currently pins its own compatible Torch/Transformers stack.
+chatterbox-tts==0.1.7
+accelerate
+bitsandbytes; platform_system != "Darwin"
+PyYAML
+pypdf
+Pillow
+pytesseract
