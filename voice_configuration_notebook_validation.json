@@ -1,0 +1,35 @@
+{
+  "notebook": "kaggle_dual_t4_tts_voice_configuration_guide.ipynb",
+  "sha256": "00f3c92284cfa43744f6bccad2709d6e010356a23115407ada1c656e08457231",
+  "nbformat_schema": "valid",
+  "cells": 25,
+  "compiled_code_cells": 10,
+  "embedded_sources_verified": [
+    "kokoro_samples.py",
+    "f5_samples.py",
+    "emotivoice_samples.py",
+    "styletts2_samples.py",
+    "omnivoice_samples.py",
+    "supertonic_samples.py",
+    "audio_quality_check.py"
+  ],
+  "all_explicit_parser_keys_documented": {
+    "kokoro": 28,
+    "f5": 31,
+    "emotivoice": 33,
+    "styletts2": 32,
+    "omnivoice": 35,
+    "supertonic": 26
+  },
+  "preset_catalog_counts": {
+    "kokoro": 54,
+    "emotivoice": 2014,
+    "supertonic": 10
+  },
+  "omnivoice_language_names": 646,
+  "catalog_cell_and_csv_export_smoke": "passed without model downloads or inference",
+  "invalid_profile_key_preflight": "passed",
+  "algorithm_function_locations": "verified against current embedded sources",
+  "previous_notebook_unchanged_sha256": "c8367df3fa483605552a7bd2d1e2524360e0a1dfb7c36c39ba23280a97b81685",
+  "updated_gpu_execution": "not run locally; inference workflow unchanged except transcript report column correction"
+}

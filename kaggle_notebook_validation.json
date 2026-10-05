@@ -1,0 +1,48 @@
+{
+  "notebook": "kaggle_dual_t4_tts_benchmark.ipynb",
+  "notebook_sha256": "c8367df3fa483605552a7bd2d1e2524360e0a1dfb7c36c39ba23280a97b81685",
+  "revision": "quality-and-speaker-controls",
+  "nbformat_schema": "valid",
+  "cells": 18,
+  "compiled_code_cells": 9,
+  "embedded_sources_sha256_verified": {
+    "kokoro_samples.py": true,
+    "f5_samples.py": true,
+    "emotivoice_samples.py": true,
+    "styletts2_samples.py": true,
+    "omnivoice_samples.py": true,
+    "supertonic_samples.py": true,
+    "audio_quality_check.py": true
+  },
+  "nonrepetitive_passage_word_counts": [
+    10,
+    100,
+    500
+  ],
+  "regression_tests": {
+    "passed": 212,
+    "failed": 0
+  },
+  "quality_and_reporting_checks_after_final_report_edit": {
+    "passed": 54,
+    "failed": 0
+  },
+  "setup_and_reference_mock_contracts": "passed",
+  "ruff": "passed",
+  "actual_updated_cpu_inference": {
+    "models": [
+      "Kokoro",
+      "Supertonic 3"
+    ],
+    "word_counts": [
+      10,
+      500
+    ],
+    "recordings": 4,
+    "sample_count_matches": 4,
+    "test_passages": "Earlier repeated validation text; the new distinct passages require the next benchmark run."
+  },
+  "cuda_execution": "Updated revision not verified locally; rerun on Kaggle T4 x2.",
+  "intelligibility": "Duration equality does not establish complete or natural speech. Independent ASR is fallible.",
+  "monitor_limitation": "Sampled NVML plus allocator limits do not prove a continuous absolute 5GB peak ceiling."
+}

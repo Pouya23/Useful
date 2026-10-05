@@ -1,0 +1,469 @@
+{
+  "created_utc": "2026-10-03T19:21:21.048409+00:00",
+  "scope": "Total exported WAV duration for 10-500 words; source-pinned standalone adapters with frozen duration/frame/token plans.",
+  "test_environment": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "torch": "2.14.1+cpu",
+      "transformers": "5.3.0",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "soundfile": "0.14.0",
+      "onnxruntime": "1.30.0",
+      "kokoro": "0.9.4",
+      "misaki": "0.9.4",
+      "pytest": "9.1.1"
+    }
+  },
+  "focused_tests": {
+    "command": "python -m pytest -q test_kokoro_planning.py test_kokoro_frontend.py test_f5_style_planning.py test_emoti_super_planning.py test_omni_planning.py",
+    "passed": 111,
+    "failed": 0,
+    "skipped": 0,
+    "elapsed_seconds": 6.19,
+    "ruff": "passed",
+    "compilation": "passed"
+  },
+  "models": {
+    "Kokoro": {
+      "pretrained_end_to_end_tested": true,
+      "tests": [
+        {
+          "manifest": "C:\\Pouya\\Work Projects\\Video Narration\\tts_duration_samples\\.validation\\kokoro_10\\kokoro_20261003T191404_e94dd3cd\\manifest.json",
+          "word_count": 10,
+          "chunks": 2,
+          "warm_preflight_seconds": 0.18375879999985045,
+          "startup_seconds": 78.04385019999972,
+          "predicted_seconds": 5.162,
+          "configuration": {
+            "text": "This test contains exactly ten words for reliable duration validation.",
+            "text_file": null,
+            "config": null,
+            "n": 2,
+            "seed": 42,
+            "voice": "tts_duration_samples/.validation/kokoro_assets/voices/af_heart.pt",
+            "voice_weights": null,
+            "language": "a",
+            "speed": 1.15,
+            "repo_id": "hexgrad/Kokoro-82M",
+            "checkpoint": "tts_duration_samples\\.validation\\kokoro_assets\\kokoro-v1_0.pth",
+            "model_config": "tts_duration_samples\\.validation\\kokoro_assets\\config.json",
+            "cache_dir": "C:\\Pouya\\Work Projects\\Video Narration\\tts_duration_samples\\.model_cache",
+            "device": "cpu",
+            "max_vram_gb": 5.0,
+            "cuda_reserve_mb": 768,
+            "threads": 4,
+            "chunk_words": 5,
+            "max_chunk_seconds": 20.0,
+            "sample_rate": 48000,
+            "pause_ms": 37.0,
+            "gain_db": 0.0,
+            "normalize_peak": false,
+            "subtype": "PCM_16",
+            "output_dir": "tts_duration_samples\\.validation\\kokoro_10",
+            "estimate_only": false,
+            "self_test": false
+          },
+          "samples": [
+            {
+              "path": "tts_duration_samples\\.validation\\kokoro_10\\kokoro_20261003T191404_e94dd3cd\\sample_001_seed_42.wav",
+              "seed": 42,
+              "measured_samples": 247776,
+              "measured_seconds": 5.162,
+              "relative_duration_error": 0.0,
+              "generation_seconds": 2.1913698999996996,
+              "memory": {
+                "device": "cpu",
+                "gpu_vram_bytes": 0,
+                "hard_gpu_limit_satisfied": true
+              }
+            },
+            {
+              "path": "tts_duration_samples\\.validation\\kokoro_10\\kokoro_20261003T191404_e94dd3cd\\sample_002_seed_43.wav",
+              "seed": 43,
+              "measured_samples": 247776,
+              "measured_seconds": 5.162,
+              "relative_duration_error": 0.0,
+              "generation_seconds": 1.9990990999999667,
+              "memory": {
+                "device": "cpu",
+                "gpu_vram_bytes": 0,
+                "hard_gpu_limit_satisfied": true
+              }
+            }
+          ]
+        },
+        {
+          "manifest": "C:\\Pouya\\Work Projects\\Video Narration\\tts_duration_samples\\.validation\\kokoro_500\\kokoro_20261003T191555_7f88f2c7\\manifest.json",
+          "word_count": 500,
+          "chunks": 15,
+          "warm_preflight_seconds": 4.340009900000041,
+          "startup_seconds": 10.822011299999758,
+          "predicted_seconds": 229.0680045351474,
+          "configuration": {
+            "text": null,
+            "text_file": "tts_duration_samples\\.validation\\kokoro_500.txt",
+            "config": null,
+            "n": 1,
+            "seed": 42,
+            "voice": "tts_duration_samples/.validation/kokoro_assets/voices/af_heart.pt",
+            "voice_weights": null,
+            "language": "a",
+            "speed": 1.2,
+            "repo_id": "hexgrad/Kokoro-82M",
+            "checkpoint": "tts_duration_samples\\.validation\\kokoro_assets\\kokoro-v1_0.pth",
+            "model_config": "tts_duration_samples\\.validation\\kokoro_assets\\config.json",
+            "cache_dir": "C:\\Pouya\\Work Projects\\Video Narration\\tts_duration_samples\\.model_cache",
+            "device": "cpu",
+            "max_vram_gb": 5.0,
+            "cuda_reserve_mb": 768,
+            "threads": 4,
+            "chunk_words": 35,
+            "max_chunk_seconds": 20.0,
+            "sample_rate": 44100,
+            "pause_ms": 37.0,
+            "gain_db": 0.0,
+            "normalize_peak": false,
+            "subtype": "PCM_16",
+            "output_dir": "tts_duration_samples\\.validation\\kokoro_500",
+            "estimate_only": false,
+            "self_test": false
+          },
+          "samples": [
+            {
+              "path": "tts_duration_samples\\.validation\\kokoro_500\\kokoro_20261003T191555_7f88f2c7\\sample_001_seed_42.wav",
+              "seed": 42,
+              "measured_samples": 10101899,
+              "measured_seconds": 229.0680045351474,
+              "relative_duration_error": 0.0,
+              "generation_seconds": 108.51317150000023,
+              "memory": {
+                "device": "cpu",
+                "gpu_vram_bytes": 0,
+                "hard_gpu_limit_satisfied": true
+              }
+            }
+          ]
+        }
+      ],
+      "duration_error_tested_fraction": 0.0,
+      "limitations": [
+        "Only af_heart English voice tested.",
+        "500-word CPU preflight 4.340 seconds does not meet a subsecond near-instant requirement.",
+        "First startup included automatic spaCy model installation."
+      ]
+    },
+    "Supertonic 3": {
+      "pretrained_end_to_end_tested": true,
+      "tests": [
+        {
+          "manifest": "C:\\Pouya\\Work Projects\\Video Narration\\tts_duration_samples\\.validation\\supertonic_exact_10_default\\supertonic_manifest.json",
+          "word_count": 10,
+          "chunks": 1,
+          "n": 2,
+          "export_rate": 44100,
+          "speed": 1.05,
+          "steps": 8,
+          "pause_ms": 0.0,
+          "warm_preview_ms": 6.022699999903125,
+          "startup_seconds": 3.6428835000001527,
+          "predicted_samples": 206143,
+          "duration_error_fraction": 0,
+          "peak_gpu_vram_bytes": 0
+        },
+        {
+          "manifest": "C:\\Pouya\\Work Projects\\Video Narration\\tts_duration_samples\\.validation\\supertonic_smoke_500\\supertonic_manifest.json",
+          "word_count": 500,
+          "chunks": 12,
+          "n": 1,
+          "export_rate": 44100,
+          "speed": 1.2,
+          "steps": 2,
+          "pause_ms": 37.0,
+          "warm_preview_ms": 182.16499999994085,
+          "startup_seconds": 4.0495306000000255,
+          "predicted_samples": 8713996,
+          "duration_error_fraction": 0,
+          "peak_gpu_vram_bytes": 0
+        },
+        {
+          "manifest": "C:\\Pouya\\Work Projects\\Video Narration\\tts_duration_samples\\.validation\\supertonic_exact_10_resampled\\supertonic_manifest.json",
+          "word_count": 10,
+          "chunks": 3,
+          "n": 2,
+          "export_rate": 48000,
+          "speed": 1.25,
+          "steps": 8,
+          "pause_ms": 37.0,
+          "warm_preview_ms": 5.129799999849638,
+          "startup_seconds": 2.0234009000000697,
+          "predicted_samples": 234923,
+          "duration_error_fraction": 0,
+          "peak_gpu_vram_bytes": 0
+        }
+      ],
+      "duration_error_tested_fraction": 0.0,
+      "limitations": [
+        "Only English M1 Supertonic voice tested; architecture length assertions apply to all supported controls, but speech quality is not validated universally.",
+        "CUDA not used; CPU scripts allocate no GPU memory.",
+        "Warm preview excludes process startup/session loading and startup decoder-length probes."
+      ]
+    },
+    "OmniVoice": {
+      "pretrained_end_to_end_tested": false,
+      "preview_latency_evidence": {
+        "model": "k2-fsa/OmniVoice",
+        "source_commit": "08be0b4ccbac3e13e374e86fbfead4b4cac343e2",
+        "weights_revision_planned": "c5fdb5ccb189668d56333f77ba2629f4cd7535f4",
+        "python": "3.13.0",
+        "platform": "Windows-11-10.0.26200-SP0",
+        "source_validation": "Official pinned source archive unpacked to isolated PYTHONPATH; utility hashes verified by script",
+        "weights_downloaded": false,
+        "model_inference_run": false,
+        "generated_speech": false,
+        "cuda_tested": false,
+        "timing_scope": {
+          "planner_ms": "Actual pure upstream duration rule, normalization/resolvers, chunk allocation and export count planning; no waveform synthesis",
+          "cold_preflight_ms": "CLI entry to completed plan, including hash verification/loading stdlib upstream utilities",
+          "process_wall_ms": "Entire new Python subprocess including output metadata write and exit"
+        },
+        "accuracy_scope": "Allocation and codec-length arithmetic checked. Final waveform/export accuracy has not been measured with model weights.",
+        "measurements": [
+          {
+            "word_count": 10,
+            "mode": "auto",
+            "configuration": {
+              "text_pattern": "narration repeated word_count times",
+              "instruct": null,
+              "language": "en",
+              "speed": 1.0,
+              "duration": null,
+              "sample_rate": 44100,
+              "pause_ms": 120.0,
+              "max_chunk_seconds": 8.0,
+              "n": 1,
+              "estimate_only": true,
+              "device": "cpu"
+            },
+            "runs": [
+              {
+                "process_wall_ms": 369.28450000004887,
+                "predicted_seconds": 6.48,
+                "predicted_samples": 285768,
+                "sample_rate": 44100,
+                "chunks": 1,
+                "planner_ms": 0.5772999998043815,
+                "cold_preflight_ms": 44.7969000001649
+              },
+              {
+                "process_wall_ms": 355.65719999976864,
+                "predicted_seconds": 6.48,
+                "predicted_samples": 285768,
+                "sample_rate": 44100,
+                "chunks": 1,
+                "planner_ms": 0.4048000000693719,
+                "cold_preflight_ms": 42.781099999956496
+              },
+              {
+                "process_wall_ms": 353.683600000295,
+                "predicted_seconds": 6.48,
+                "predicted_samples": 285768,
+                "sample_rate": 44100,
+                "chunks": 1,
+                "planner_ms": 0.39470000001529115,
+                "cold_preflight_ms": 42.30429999961416
+              }
+            ]
+          },
+          {
+            "word_count": 10,
+            "mode": "voice_design",
+            "configuration": {
+              "text_pattern": "narration repeated word_count times",
+              "instruct": "female, low pitch, british accent",
+              "language": "en",
+              "speed": 1.0,
+              "duration": null,
+              "sample_rate": 44100,
+              "pause_ms": 120.0,
+              "max_chunk_seconds": 8.0,
+              "n": 1,
+              "estimate_only": true,
+              "device": "cpu"
+            },
+            "runs": [
+              {
+                "process_wall_ms": 337.14229999986856,
+                "predicted_seconds": 6.48,
+                "predicted_samples": 285768,
+                "sample_rate": 44100,
+                "chunks": 1,
+                "planner_ms": 0.4851000003327499,
+                "cold_preflight_ms": 37.980399999923975
+              },
+              {
+                "process_wall_ms": 344.6947000002183,
+                "predicted_seconds": 6.48,
+                "predicted_samples": 285768,
+                "sample_rate": 44100,
+                "chunks": 1,
+                "planner_ms": 0.5650000002788147,
+                "cold_preflight_ms": 43.80040000023655
+              },
+              {
+                "process_wall_ms": 364.44710000023406,
+                "predicted_seconds": 6.48,
+                "predicted_samples": 285768,
+                "sample_rate": 44100,
+                "chunks": 1,
+                "planner_ms": 0.609200000326382,
+                "cold_preflight_ms": 43.49099999990358
+              }
+            ]
+          },
+          {
+            "word_count": 500,
+            "mode": "auto",
+            "configuration": {
+              "text_pattern": "narration repeated word_count times",
+              "instruct": null,
+              "language": "en",
+              "speed": 1.0,
+              "duration": null,
+              "sample_rate": 44100,
+              "pause_ms": 120.0,
+              "max_chunk_seconds": 8.0,
+              "n": 1,
+              "estimate_only": true,
+              "device": "cpu"
+            },
+            "runs": [
+              {
+                "process_wall_ms": 375.7815999997547,
+                "predicted_seconds": 329.92,
+                "predicted_samples": 14549472,
+                "sample_rate": 44100,
+                "chunks": 42,
+                "planner_ms": 11.139899999761838,
+                "cold_preflight_ms": 55.45810000012352
+              },
+              {
+                "process_wall_ms": 337.67589999979464,
+                "predicted_seconds": 329.92,
+                "predicted_samples": 14549472,
+                "sample_rate": 44100,
+                "chunks": 42,
+                "planner_ms": 7.428200000049401,
+                "cold_preflight_ms": 45.1216999999815
+              },
+              {
+                "process_wall_ms": 360.7147000002442,
+                "predicted_seconds": 329.92,
+                "predicted_samples": 14549472,
+                "sample_rate": 44100,
+                "chunks": 42,
+                "planner_ms": 9.777700000086043,
+                "cold_preflight_ms": 55.82540000023073
+              }
+            ]
+          },
+          {
+            "word_count": 500,
+            "mode": "voice_design",
+            "configuration": {
+              "text_pattern": "narration repeated word_count times",
+              "instruct": "female, low pitch, british accent",
+              "language": "en",
+              "speed": 1.0,
+              "duration": null,
+              "sample_rate": 44100,
+              "pause_ms": 120.0,
+              "max_chunk_seconds": 8.0,
+              "n": 1,
+              "estimate_only": true,
+              "device": "cpu"
+            },
+            "runs": [
+              {
+                "process_wall_ms": 315.2290000002722,
+                "predicted_seconds": 329.92,
+                "predicted_samples": 14549472,
+                "sample_rate": 44100,
+                "chunks": 42,
+                "planner_ms": 9.344099999907485,
+                "cold_preflight_ms": 47.41669999975784
+              },
+              {
+                "process_wall_ms": 338.0004000000554,
+                "predicted_seconds": 329.92,
+                "predicted_samples": 14549472,
+                "sample_rate": 44100,
+                "chunks": 42,
+                "planner_ms": 8.287699999982578,
+                "cold_preflight_ms": 49.07000000002881
+              },
+              {
+                "process_wall_ms": 345.32119999994393,
+                "predicted_seconds": 329.92,
+                "predicted_samples": 14549472,
+                "sample_rate": 44100,
+                "chunks": 42,
+                "planner_ms": 9.413900000254216,
+                "cold_preflight_ms": 48.25510000000577
+              }
+            ]
+          }
+        ]
+      },
+      "limitation": "Measured pure source-verified token allocation only; final waveform export remains unverified with pretrained weights."
+    },
+    "EmotiVoice": {
+      "pretrained_end_to_end_tested": false,
+      "length_contract_evidence": {
+        "official_hifigan_real_module_random_weights": {
+          "frames": [
+            1,
+            2,
+            5,
+            32,
+            100,
+            333
+          ],
+          "predicted_actual_samples": [
+            256,
+            512,
+            1280,
+            8192,
+            25600,
+            85248
+          ],
+          "status": "passed"
+        },
+        "full_pretrained_generation": "not tested; original generator, style and SimBERT checkpoints were not downloaded"
+      },
+      "warm_preflight_latency_measured": false
+    },
+    "F5-TTS": {
+      "pretrained_end_to_end_tested": false,
+      "length_contract_tests": "Actual pinned CFM.sample duration clamp executed with dummy flow; actual centered torch ISTFT lengths; exact join/resampling/config tests passed.",
+      "warm_preflight_latency_measured": false,
+      "interpretation": "Allocated output duration, not unconstrained natural reading prediction."
+    },
+    "StyleTTS2": {
+      "pretrained_end_to_end_tested": false,
+      "length_contract_tests": "Actual torch convolution temporal geometry of official LibriTTS HifiGAN; exact join/resampling/config tests passed.",
+      "warm_preflight_latency_measured": false,
+      "limitation": "Exact preflight runs style diffusion per take and chunk; near-instant latency not established."
+    }
+  },
+  "limits": {
+    "total_duration_accuracy": "Tested exports had zero sample-count error. Scripts enforce sample-count equality for successful outputs; universal quality/intelligibility was not established.",
+    "cuda_tested": false,
+    "hard_total_cuda_5gb_peak_certified": false,
+    "default_cpu_gpu_vram_bytes": 0,
+    "gpu_limit_bytes": 5000000000,
+    "near_instant_for_all_models": false,
+    "fastest_empirically_complete_match": "Supertonic 3 on CPU: actual 10/500-word synthesis, exact exported duration, 5-6 ms/182 ms duration-only preflight."
+  }
+}

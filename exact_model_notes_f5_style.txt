@@ -1,0 +1,120 @@
+F5-TTS and StyleTTS2 implementation/verification notes
+
+These are two independent Python scripts. Neither imports the other. Setup
+commands below are PowerShell commands run in tts_duration_samples. Keep a
+separate environment for each model. Python 3.12 is recommended. CPU commands
+are shown because CPU guarantees zero GPU VRAM. For CUDA, install the same
+torch/torchaudio versions from the appropriate official PyTorch wheel index;
+the scripts implement an allocator cap but cannot promise a hard total-process
+GPU cap. Optional process VRAM telemetry requires nvidia-ml-py.
+
+F5 setup:
+  py -3.12 -m venv .venv-f5
+  .\.venv-f5\Scripts\python.exe -m pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+  .\.venv-f5\Scripts\python.exe -m pip install scipy soundfile tqdm safetensors huggingface_hub vocos==0.1.0 pypinyin rjieba librosa einops "x_transformers>=1.31.14" torchdiffeq
+  git clone https://github.com/SWivid/F5-TTS.git F5-TTS
+  git -C F5-TTS checkout 283252563dbf91be625e0c27926acfaac449186c
+  .\.venv-f5\Scripts\python.exe f5_samples.py --repo .\F5-TTS --text-file passage.txt --reference-audio reference.wav --reference-text "Exact reference transcript." --n 3 --output-dir .\runs\f5_run_001
+
+The --repo source path is imported directly, so no pip editable install or
+training/Gradio/ASR stack is required. First generation downloads the pinned
+official EMA generator, its vocabulary and Vocos; --estimate-only only needs
+the small vocabulary download and the reference waveform. Offline options
+are --checkpoint, --vocab and --vocos-dir (config.yaml+pytorch_model.bin).
+Reference audio is used without silence trimming and must be clean 1..8 s.
+F5 weights are CC-BY-NC-4.0, despite the source's MIT license.
+
+F5 supported controls: n, seed, device, export sampling rate, speed, optional
+allocated duration target, flow steps, CFG, sway, ODE method, EPSS, reference
+voice/style, reference normalization target, byte/time chunk bounds, explicit
+pauses or crossfades and WAV sample subtype. Duration-seconds is generated
+content allocation before joins, quantized to frames and subject to CFM clamp;
+the actual resulting preview is always displayed. There is no invented
+independent emotion or word-emphasis control. Progress includes flow evaluations
+and completed chunks. GPU chunks are serialized.
+
+F5 source/weights:
+  https://github.com/SWivid/F5-TTS/tree/283252563dbf91be625e0c27926acfaac449186c
+  https://huggingface.co/SWivid/F5-TTS/tree/84e5a410d9cead4de2f847e7c9369a6440bdfaca/F5TTS_v1_Base
+  https://huggingface.co/charactr/vocos-mel-24khz/tree/0feb3fdd929bcd6649e0e7c5a688cf7dd012ef21
+
+F5 exact temporal contract: the Vocos frontend has floor(reference_samples/256)
++1 centered-STFT frames. The upstream prompt slice starts at floor(samples/256).
+CFM.sample clamps requested duration to at least max(reference_mel_frames,
+nonpadding_text_tokens)+1 and at most 65536. For the pinned centered Vocos head,
+output_samples=(generated_mel_frames-1)*256. The script reproduces that clamp
+and reuse plan, then checks both generated frames and actual vocoder length.
+It accounts for every explicit overlap/pause and ceil polyphase resampling.
+The estimate is an allocated waveform length, not a natural-duration forecast.
+
+StyleTTS2 setup:
+  py -3.12 -m venv .venv-style
+  .\.venv-style\Scripts\python.exe -m pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+  .\.venv-style\Scripts\python.exe -m pip install scipy numpy soundfile tqdm huggingface_hub pyyaml munch transformers==4.44.2 einops einops-exts librosa phonemizer nltk
+  git clone https://github.com/yl4579/StyleTTS2.git StyleTTS2
+  git -C StyleTTS2 checkout 5cedc71c333f8d8b8551ca59378bdcc7af4c9529
+  .\.venv-style\Scripts\python.exe styletts2_samples.py --repo .\StyleTTS2 --text-file passage.txt --reference-audio reference.wav --n 3 --output-dir .\runs\style_run_001
+
+Install espeak-ng separately and make its shared library available to phonemizer
+(Windows PHONEMIZER_ESPEAK_LIBRARY points to libespeak-ng.dll). This adapter
+does not import the upstream training utils or monotonic_align extension, and
+does not use NLTK downloaded tokenization data. It uses TreebankWordTokenizer
+directly. First run downloads the official model config and checkpoint. ASR,
+F0 extraction weights and PLBERT's separate pretrained checkpoint are not needed:
+the final LibriTTS checkpoint contains the complete inference BERT weights.
+Its BERT architecture config is read from the pinned source checkout.
+
+Style supported controls: n, seed, speed via pre-rounding phoneme durations,
+alpha/beta reference-style blending, diffusion steps, embedding guidance,
+interchunk style continuity, pitch multiplier, reference voice/style, language
+en-us/en-gb, token/word/time chunk bounds, explicit joins, fixed native-sample
+tail trim, output sample rate and subtype. Arbitrary named emotions and precise
+lexical emphasis are not claimed. Reference audio is not silence-trimmed.
+
+Style source/weights:
+  https://github.com/yl4579/StyleTTS2/tree/5cedc71c333f8d8b8551ca59378bdcc7af4c9529
+  https://huggingface.co/yl4579/StyleTTS2-LibriTTS/tree/3aa7ba7f8f275ec13dce21682a61494c35089e2a
+
+Style exact temporal contract: official LibriTTS's HifiGAN doubles aligned
+duration frames, then upsamples by 10*5*3*2, giving 600 native samples per integer
+duration unit. The official notebook crops a fixed 50 samples at the tail;
+this is an explicit --tail-trim-samples setting, default 50, and fully accounted
+for in the preview. It is not a posthoc adjustment to match a target. The sampled
+styles, integer durations and duration-conditioned encoding are cached, so F0/
+energy prediction and decoding cannot alter the length. The waveform decoder
+and text encoder do not run until the previews are printed. Style diffusion and
+BERT/duration inference do run during preflight, so latency is measured rather
+than promised. All cached plans live on CPU and chunks decode sequentially.
+
+Estimate/resume example (use a fresh output directory for generation):
+  .\.venv-style\Scripts\python.exe styletts2_samples.py --repo .\StyleTTS2 --text-file passage.txt --reference-audio reference.wav --n 3 --estimate-only --output-dir .\runs\style_preview_001
+  .\.venv-style\Scripts\python.exe styletts2_samples.py --repo .\StyleTTS2 --text-file passage.txt --reference-audio reference.wav --n 3 --reuse-plan .\runs\style_preview_001\duration_plan.pt --output-dir .\runs\style_render_001
+
+Both scripts:
+  - Require the requested 10..500 whitespace-separated word range.
+  - Accept JSON config using argparse destination keys, validate JSON types,
+    and let explicit CLI text/Boolean controls override config.
+  - Default to CPU (zero GPU VRAM), enforce <=5 decimal GB in CUDA allocator
+    budgeting, leave .75 GB overhead reserve and report observed peak allocation,
+    reservation and optional sampled total NVML process usage honestly.
+  - Refuse to overwrite an earlier manifest/plan/sample run.
+  - Never content-trim silence or pad/crop speech to force a target duration.
+  - Refuse export unless predicted and measured exported sample counts agree
+    exactly; also reopen each WAV and verify its sample count/rate.
+  - Write settings, text, source/weight revisions, timing, exact previews,
+    actual sample counts/errors and measured memory to manifest.json.
+  - Do not promise clean speech quality merely because duration is exact.
+
+Verification completed on this machine:
+  - Python compilation, --help and argument/config validation passed.
+  - 35 model-independent pytest checks passed on the existing Python environment.
+  - Additional isolated torch CPU runtime checks executed the actual pinned
+    CFM.sample clamp code (with a dummy flow integrator), centered ISTFT output
+    lengths and the full Style HifiGAN temporal upsampling topology successfully.
+  - Actual pretrained F5/Style speech inference is unverified: large checkpoints
+    and all corresponding dependencies were not downloaded for these checks.
+  - CUDA peak VRAM and actual warm estimator latency are unverified here.
+
+Focused tests: python -m pytest -q test_f5_style_planning.py
+Torch/scipy-specific checks skip when those optional test dependencies are absent.
+The actual upstream-CFM test uses _source_checks/f5_cfm.py if that snapshot exists.
