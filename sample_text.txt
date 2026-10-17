@@ -1,1 +1,0 @@
-This test contains exactly ten words for reliable duration validation.
