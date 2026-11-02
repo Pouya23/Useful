@@ -1,0 +1,422 @@
+{
+  "schema_version": "2.0",
+  "title": "Rigging video VQA: nine calls with predefined single-label answers",
+  "design_status": "Designed starting configuration; not empirically validated on the user's clips.",
+  "max_task_vlm_calls_per_video": 9,
+  "budget_assumption": "Nine is the existing question count, used as the ceiling because no smaller limit was supplied.",
+  "output_contract": {
+    "model_output": "Return exactly one raw label from the selected question's model_selectable_answers. No explanatory prose, JSON objects, arrays, or multiple labels.",
+    "stored_answer_vocabulary": "Each question's possible_answers is its complete predefined vocabulary, including not_applicable where routing can assign it.",
+    "pipeline_only_answer": "not_applicable",
+    "failure_policy": "If a response is outside the exact vocabulary, record a failed response with no accepted label. Do not coerce it to no or use another model for repair.",
+    "automatic_retries": 0
+  },
+  "scope": {
+    "one_target_load_per_assessment": true,
+    "multiple_loads": "Supply an unambiguous target description or split the assessment by load. Do not combine observations from independent lifts.",
+    "temporal_scope": "Any clearly observed qualifying event in the supplied clip; not the entire real-world lift outside the clip.",
+    "concurrence": "All conditions within a relationship must coincide for the same target and relevant person/gear. Different questions may refer to different times or people.",
+    "support_surface": "Ground, vehicle bed, platform, deck, pallet, or another surface visibly supporting the load.",
+    "proximity": {
+      "threshold_in_adult_standing_heights": 2,
+      "reference": "Approximate scene distance from the person's body to the nearest part of the suspended load, using a nearby standing adult at comparable depth for scale when possible.",
+      "ambiguity": "Return null when perspective, depth, scale, occlusion, or a borderline distance prevents a defensible estimate. Pixel overlap or pixel gap alone is insufficient.",
+      "interpretation": "This is a dataset proximity convention, not a certified clearance threshold."
+    }
+  },
+  "shared_instruction": "Assess one identifiable target load and its associated lifting gear in the supplied clip. Select exactly one predefined answer label for the requested question and output only that label. Event labels mean clearly observed at any time in this clip; they do not describe the whole operation outside it. Conditions within an event must coincide for the same target and relevant person or gear. Use the question's selection rule when multiple events occur. Preserve a confirmed positive even if another interval or relation is uncertain. Use unclear when no supported answer can be selected. Do not infer absence from occlusion. Support surfaces include ground, vehicle beds, decks, platforms, and pallets. Gloved hands count. Do not output not_applicable; routing code assigns it.",
+  "questions": {
+    "4.1": {
+      "name": "Observed hook and load state",
+      "question": "Which crane-hook/load state is clearly observed at any time in the clip? If several states are observed, apply the stated priority.",
+      "possible_answers": [
+        "attached_airborne_observed",
+        "attached_on_support_observed",
+        "detached_load_visible",
+        "load_visible_state_unclear",
+        "empty_hook_only",
+        "crane_or_rigging_only",
+        "none_visible",
+        "unclear"
+      ],
+      "selection_rule": "If the target load is visible, choose the first clearly supported label in this order: attached_airborne_observed; attached_on_support_observed; detached_load_visible; otherwise load_visible_state_unclear. The connection and support state must coincide for that same load. If no target load is visible, choose empty_hook_only when a clearly empty hook is visible; otherwise crane_or_rigging_only when lifting equipment is visible; otherwise none_visible when absence is adequately established. Use unclear when even the scene cannot be determined.",
+      "definitions": {
+        "attached_airborne_observed": "The target load is visibly connected to lifting gear and clear of supporting surfaces at the same time.",
+        "attached_on_support_observed": "The target load is visibly connected to lifting gear while supported by a surface.",
+        "detached_load_visible": "The target load is visible and a disconnected/unhooked state is clearly established.",
+        "load_visible_state_unclear": "A target load is visible but no higher-priority connection/support state is clearly established.",
+        "empty_hook_only": "A hook is clearly empty and no target load appears anywhere in the supplied clip.",
+        "crane_or_rigging_only": "A crane or lifting gear is visible but no target load appears and a clearly empty hook is not established.",
+        "none_visible": "Neither the target load nor crane/hook/lifting gear is visible in an adequately interpretable clip.",
+        "unclear": "The relevant scene cannot be resolved."
+      },
+      "model_selectable_answers": [
+        "attached_airborne_observed",
+        "attached_on_support_observed",
+        "detached_load_visible",
+        "load_visible_state_unclear",
+        "empty_hook_only",
+        "crane_or_rigging_only",
+        "none_visible",
+        "unclear"
+      ],
+      "response_schema": {
+        "type": "string",
+        "enum": [
+          "attached_airborne_observed",
+          "attached_on_support_observed",
+          "detached_load_visible",
+          "load_visible_state_unclear",
+          "empty_hook_only",
+          "crane_or_rigging_only",
+          "none_visible",
+          "unclear"
+        ]
+      }
+    },
+    "4.2": {
+      "name": "Observed movement phase",
+      "question": "Which movement-phase summary best describes the target load during the clip?",
+      "possible_answers": [
+        "lift_off_and_landing_observed",
+        "lift_off_observed",
+        "landing_observed",
+        "supported_and_airborne_observed",
+        "airborne_observed",
+        "resting_on_support_throughout",
+        "unclear",
+        "not_applicable"
+      ],
+      "selection_rule": "Choose lift_off_and_landing_observed if both transitions are clearly witnessed. Otherwise choose lift_off_observed if lift-off is witnessed, then landing_observed if landing is witnessed. If neither transition is witnessed but both supported and airborne states are visible, choose supported_and_airborne_observed. Otherwise choose airborne_observed if an airborne state is clear. Choose resting_on_support_throughout only when the load and support are sufficiently visible throughout the supplied clip to establish no suspended interval. Otherwise choose unclear. not_applicable is assigned by routing code only.",
+      "definitions": {
+        "lift_off_and_landing_observed": "Both a support-to-air transition and an air-to-support transition are observed, in any order or cycles.",
+        "lift_off_observed": "A support-to-air transition is observed and landing is not also confirmed. This does not mean the load did nothing else.",
+        "landing_observed": "An air-to-support transition is observed and lift-off is not also confirmed.",
+        "supported_and_airborne_observed": "Both support and airborne states are observed, but no transition between them is clearly witnessed.",
+        "airborne_observed": "Moving or holding clear of supporting surfaces is observed; no higher-priority phase summary is confirmed.",
+        "resting_on_support_throughout": "The load remains supported throughout an adequately observed clip. This is the only negative-suspension label used for gating.",
+        "unclear": "No preceding summary is defensible; occluded intervals may prevent ruling out suspension."
+      },
+      "model_selectable_answers": [
+        "lift_off_and_landing_observed",
+        "lift_off_observed",
+        "landing_observed",
+        "supported_and_airborne_observed",
+        "airborne_observed",
+        "resting_on_support_throughout",
+        "unclear"
+      ],
+      "response_schema": {
+        "type": "string",
+        "enum": [
+          "lift_off_and_landing_observed",
+          "lift_off_observed",
+          "landing_observed",
+          "supported_and_airborne_observed",
+          "airborne_observed",
+          "resting_on_support_throughout",
+          "unclear"
+        ]
+      }
+    },
+    "4.3": {
+      "name": "Visible suspended-load motion",
+      "question": "While the target load is suspended, does it clearly swing back and forth or rotate about its suspension axis?",
+      "possible_answers": [
+        "yes",
+        "no",
+        "unclear",
+        "not_applicable"
+      ],
+      "selection_rule": "yes requires clearly observed swinging or rotation. Exclude smooth translation with the crane and apparent motion due only to camera movement. no requires an adequate view of the relevant suspended interval without the motion. Otherwise use unclear. This records visible motion rather than inferred loss of control.",
+      "model_selectable_answers": [
+        "yes",
+        "no",
+        "unclear"
+      ],
+      "response_schema": {
+        "type": "string",
+        "enum": [
+          "yes",
+          "no",
+          "unclear"
+        ]
+      }
+    },
+    "4.4": {
+      "name": "Tagline handling",
+      "question": "Does any person visibly hold or pull a separate guide rope connected to the target load?",
+      "possible_answers": [
+        "yes",
+        "no",
+        "unclear",
+        "not_applicable"
+      ],
+      "selection_rule": "Count a tagline: a separate guide rope connected to the load. Do not count load-bearing slings, chains, a hoist line, or an unattached rope. A rope merely being present does not establish handling. If the connection, role, or hand interaction cannot be distinguished, use unclear. This applies to supported and suspended loads.",
+      "model_selectable_answers": [
+        "yes",
+        "no",
+        "unclear"
+      ],
+      "response_schema": {
+        "type": "string",
+        "enum": [
+          "yes",
+          "no",
+          "unclear"
+        ]
+      }
+    },
+    "4.5": {
+      "name": "Direct hand contact and contact height",
+      "question": "What direct hand contact with the target load is clearly observed, relative to the waist of the person making that contact?",
+      "possible_answers": [
+        "both_heights_observed",
+        "above_waist_observed",
+        "at_or_below_waist_observed",
+        "contact_visible_height_unclear",
+        "no_direct_contact",
+        "unclear",
+        "not_applicable"
+      ],
+      "selection_rule": "Count bare or gloved hands touching the load itself; holding only a rope, sling, chain, or hook does not count. Compare each contact with that same person's waist at that time. If contacts at both heights are confirmed, choose both_heights_observed. Otherwise choose the confirmed height, even if another contact's height is obscured. If contact is certain but no height can be determined, choose contact_visible_height_unclear. Choose no_direct_contact only with adequate visibility and no direct contact; otherwise unclear.",
+      "interpretation": "Labels say observed, not only. above_waist_observed does not prove every other contact was above the waist. Any of the four contact-positive labels establishes direct hand contact for the derived method summary.",
+      "model_selectable_answers": [
+        "both_heights_observed",
+        "above_waist_observed",
+        "at_or_below_waist_observed",
+        "contact_visible_height_unclear",
+        "no_direct_contact",
+        "unclear"
+      ],
+      "response_schema": {
+        "type": "string",
+        "enum": [
+          "both_heights_observed",
+          "above_waist_observed",
+          "at_or_below_waist_observed",
+          "contact_visible_height_unclear",
+          "no_direct_contact",
+          "unclear"
+        ]
+      }
+    },
+    "4.6": {
+      "name": "Contact with taut or tightening gear",
+      "question": "What hand contact with taut or tightening lifting gear is visible during the target operation?",
+      "possible_answers": [
+        "contact_while_taut_or_tightening",
+        "taut_or_tightening_without_contact",
+        "slack_only",
+        "unclear",
+        "not_applicable"
+      ],
+      "selection_rule": "contact_while_taut_or_tightening has precedence when a hand touches a sling or chain while that same item is visibly taut/tightening, or touches the hook while the load-connected rigging is taut/tightening. Use taut_or_tightening_without_contact only when taut/tightening gear is adequately visible and no qualifying contact occurs. Use slack_only only when the relevant gear is adequately visible and remains slack. Otherwise unclear. Judge the connected gear's tension, not the rigidity of the hook. This question remains applicable before lift-off.",
+      "no_people_rule": "No visible people rules out visible hand contact but does not identify slack versus taut or unobservable gear. Do not skip this question on the no-people gate.",
+      "model_selectable_answers": [
+        "contact_while_taut_or_tightening",
+        "taut_or_tightening_without_contact",
+        "slack_only",
+        "unclear"
+      ],
+      "response_schema": {
+        "type": "string",
+        "enum": [
+          "contact_while_taut_or_tightening",
+          "taut_or_tightening_without_contact",
+          "slack_only",
+          "unclear"
+        ]
+      }
+    },
+    "4.7": {
+      "name": "Position relative to suspended load",
+      "question": "While the target load is suspended, is any person directly beneath it or in a narrow gap between it and an adjacent wall, vehicle, or structure?",
+      "possible_answers": [
+        "both_relations_observed",
+        "under_load_observed",
+        "between_load_and_structure_observed",
+        "neither_observed",
+        "unclear",
+        "not_applicable"
+      ],
+      "selection_rule": "Choose both_relations_observed when both positions are clearly witnessed, even at different times or for different people. Otherwise choose the clearly witnessed positive relation. Choose neither_observed only when both relations are adequately observable and neither occurs. Use unclear when no positive is established and either relation cannot be judged. Image overlap alone does not establish beneath-load position. A between position means the load and adjacent structure directly bound a narrow gap occupied by the person; do not infer physical entrapment.",
+      "interpretation": "An observed-positive label does not prove that the unreported relation was absent. Preserve the confirmed positive in downstream interpretation.",
+      "model_selectable_answers": [
+        "both_relations_observed",
+        "under_load_observed",
+        "between_load_and_structure_observed",
+        "neither_observed",
+        "unclear"
+      ],
+      "response_schema": {
+        "type": "string",
+        "enum": [
+          "both_relations_observed",
+          "under_load_observed",
+          "between_load_and_structure_observed",
+          "neither_observed",
+          "unclear"
+        ]
+      }
+    },
+    "4.8": {
+      "name": "Proximity to suspended load",
+      "question": "While the target load is suspended, is any visible person within approximately two adult standing heights of its nearest part?",
+      "possible_answers": [
+        "yes",
+        "no",
+        "unclear",
+        "not_applicable"
+      ],
+      "selection_rule": "Use approximate physical separation in the scene, accounting for perspective and a nearby adult at comparable depth for scale when possible. Do not substitute image-plane gap, touching, or arm's reach for this criterion. Use unclear when depth, scale, occlusion, or a borderline distance prevents a defensible estimate. The two-height cutoff is fixed during prompt search.",
+      "model_selectable_answers": [
+        "yes",
+        "no",
+        "unclear"
+      ],
+      "response_schema": {
+        "type": "string",
+        "enum": [
+          "yes",
+          "no",
+          "unclear"
+        ]
+      }
+    },
+    "4.9": {
+      "name": "Visible facing and signaling",
+      "question": "What visible evidence of facing the target load or giving lift-directed hand/arm signals is observed during the clip?",
+      "possible_answers": [
+        "signaling_and_facing_observed",
+        "signaling_observed",
+        "facing_load_observed",
+        "people_visible_neither_observed",
+        "no_people_visible",
+        "unclear",
+        "not_applicable"
+      ],
+      "selection_rule": "Choose signaling_and_facing_observed if both are confirmed, possibly for different people or times. Otherwise choose whichever positive is clearly confirmed. Signaling means recognizable hand/arm signals directed toward the crane/operator; ordinary reaching, equipment handling, or incidental waving is insufficient. For facing, use head direction when discernible, otherwise clear upper-body orientation; a visibly averted head takes precedence over torso direction. Use people_visible_neither_observed only with adequate visibility to assess both and neither occurs. Use no_people_visible only when the whole clip adequately establishes no visible people, including recognizable body parts. Otherwise unclear.",
+      "interpretation": "Facing is an orientation proxy, not proof of attention. A single observed-positive label does not assert that the other behavior was conclusively absent.",
+      "model_selectable_answers": [
+        "signaling_and_facing_observed",
+        "signaling_observed",
+        "facing_load_observed",
+        "people_visible_neither_observed",
+        "no_people_visible",
+        "unclear"
+      ],
+      "response_schema": {
+        "type": "string",
+        "enum": [
+          "signaling_and_facing_observed",
+          "signaling_observed",
+          "facing_load_observed",
+          "people_visible_neither_observed",
+          "no_people_visible",
+          "unclear"
+        ]
+      }
+    }
+  },
+  "execution": {
+    "preferred_order": [
+      "4.1",
+      "4.2",
+      "4.9",
+      "4.3",
+      "4.4",
+      "4.5",
+      "4.6",
+      "4.7",
+      "4.8"
+    ],
+    "max_calls_per_asked_question": 1,
+    "extra_calls_for_gating": 0,
+    "request_contents": "Send the same target video through the chosen model's native processor plus shared_instruction and only the selected question's question, selection_rule, relevant definitions, and model_selectable_answers.",
+    "zero_shot_start": true,
+    "per_question_schema_is_fixed": true,
+    "search_budget_note": "The nine-call ceiling covers task-VLM attempts for one video. Prompt optimization repeats these evaluations; proposer/reflection costs and total search costs require separate budgets."
+  },
+  "gating": {
+    "no_visible_load": {
+      "source": "4.1",
+      "labels": [
+        "empty_hook_only",
+        "crane_or_rigging_only",
+        "none_visible"
+      ],
+      "action": "End after 4.1 and assign not_applicable to 4.2-4.9. Preserve the scene label; no conclusion is made about off-camera loads."
+    },
+    "no_suspended_interval": {
+      "source": "4.2",
+      "labels": [
+        "resting_on_support_throughout"
+      ],
+      "action": "Assign not_applicable to 4.3, 4.7, and 4.8. Keep 4.4, 4.5, 4.6, and 4.9 active."
+    },
+    "no_visible_people": {
+      "source": "4.9",
+      "labels": [
+        "no_people_visible"
+      ],
+      "derived_answers": {
+        "4.4": "no",
+        "4.5": "no_direct_contact",
+        "4.7": "neither_observed",
+        "4.8": "no"
+      },
+      "action": "Skip those worker-event calls and store derived status with reason no_visible_people. Do not replace an existing not_applicable label. Keep 4.6 active to preserve slack/taut information."
+    },
+    "unresolved_gate": "unclear, load_visible_state_unclear, an invalid response, or an absent result must not suppress downstream questions.",
+    "precedence": "A not_applicable result from a confirmed prerequisite gate takes precedence over an inferred negative.",
+    "maximum_call_count": 9,
+    "illustrative_call_counts": {
+      "clear_no_visible_target_load": 1,
+      "load_supported_throughout_with_people": 6,
+      "suspended_load_no_visible_people": 5,
+      "load_supported_throughout_no_visible_people": 4,
+      "all_questions_applicable_or_gates_unresolved": 9
+    }
+  },
+  "derived_information": {
+    "original_4_4_methods": {
+      "direct_contact_positive_labels": [
+        "both_heights_observed",
+        "above_waist_observed",
+        "at_or_below_waist_observed",
+        "contact_visible_height_unclear"
+      ],
+      "direct_contact_negative_label": "no_direct_contact",
+      "sources": [
+        "4.4",
+        "4.5"
+      ],
+      "rule": "Derive the hand-contact component from 4.5 and tagline handling from 4.4. Both positive means both_methods_observed; both negative means neither_method_observed; one positive and the other negative yields the corresponding observed method. If a component is unclear, preserve the known component and leave the complete combination unresolved.",
+      "semantics": "Observed direct contact is not automatically purposeful guidance; both methods may occur at different times or involve different people."
+    },
+    "observed_positive_labels": "An observed-positive summary confirms the named behavior(s). It does not establish negatives for every unreported behavior or hidden interval.",
+    "single_label_tradeoff": "These are predefined clip-level summaries. They cover the original assessment categories but do not encode a complete timeline or every partial-uncertainty combination.",
+    "state_and_phase": "Keep 4.1 and 4.2 separate to avoid a large joint state-by-phase answer vocabulary."
+  },
+  "intentional_clarifications": [
+    "One fixed label per call; no lists of observed phases or JSON-valued VLM answers.",
+    "Visible swing/rotation is assessed without inferring loss of control.",
+    "A between-load-and-structure position is assessed without inferring entrapment.",
+    "Facing is assessed without inferring actual attention.",
+    "Direct hand contact includes gloves.",
+    "The proximity cutoff is one fixed value: approximately two adult standing heights.",
+    "Multi-event clips use explicit selection rules and combined labels where supplied.",
+    "no and unclear remain distinct; not_applicable is routing-assigned."
+  ],
+  "evaluation": {
+    "annotate_to_this_contract": "Review labels affected by priority rules, multiple phases, mixed contact heights, visibility, and the clarified proximity definition.",
+    "label_changes_are_schema_changes": "Freeze possible_answers, meanings, and gating during ordinary prompt-template optimization.",
+    "compare_models": "Optimize wording for Qwen3-VL-8B-Instruct and Molmo2-8B separately under matched search budgets and the same underlying target definitions.",
+    "evaluate_fixed_targets": "Use the same fixed assessment categories. Do not reward a design merely for changing the number of output fields or abstaining on all difficult clips.",
+    "gate_audit": "Check whether 4.1, 4.2, and 4.9 gates wrongly suppress downstream positives on a separate diagnostic subset.",
+    "report_cost": "Report maximum and average calls per video, format failures, abstention frequency, inference latency/cost, and separate optimization overhead.",
+    "final_test": "Keep the final grouped test set out of all prompt, example-selection, and fine-tuning decisions."
+  },
+  "version_change": "Replaces the previous structured-response design with nine predefined single-label classifiers. Restores separate state and phase questions and recombines visible facing/signaling into one closed-vocabulary assessment."
+}
